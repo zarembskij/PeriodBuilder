@@ -39,7 +39,8 @@ public class Main {
         endDate = endDate.stream().distinct().sorted().collect(Collectors.toList());
 
         PeriodBuilder builder = new PeriodBuilder();
-        List<Period> result = builder.buildPeriod(startDate, endDate);
+ //       List<Period> result = builder.buildPeriod(startDate, endDate);
+        List<Period> result = builder.buildPeriodNew(startDate, endDate);
         result.size();
 
     }

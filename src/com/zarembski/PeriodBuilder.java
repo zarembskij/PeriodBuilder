@@ -1,9 +1,9 @@
 package com.zarembski;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PeriodBuilder {
     public List<Period> buildPeriod(List<Date> startDateList, List<Date> endDateList) {
@@ -54,5 +54,26 @@ public class PeriodBuilder {
 
     private Date removeOneDay(Date date) {
         return new Date(date.getTime() + TimeUnit.DAYS.toMillis(-1));
+    }
+
+    public List<Period> buildPeriodNew(List<Date> startDateList, List<Date> endDateList) {
+        Date startDate = startDateList.stream().sorted().findFirst().get();
+        Date endDate = endDateList.stream().sorted(Comparator.reverseOrder()).findFirst().get();
+
+        Set<Pair> pairSet = Stream.concat(startDateList.stream().filter(d -> !d.equals(startDate)).map(d -> new Pair(removeOneDay(d), d)),
+                endDateList.stream().filter(d -> !d.equals(endDate)).map(d -> new Pair(d, addOneDay(d)))).collect(Collectors.toCollection(TreeSet::new));
+
+        return pairSet.size() > 0 ? makePeriodFromPair(startDate, endDate, pairSet) : Stream.of(new Period(startDate, endDate)).collect(Collectors.toList());
+    }
+
+    private List<Period> makePeriodFromPair(Date startDate, Date endDate, Set<Pair> pairSet) {
+        List<Period> periodList = new LinkedList<>();
+
+        periodList.add(new Period(startDate, pairSet.iterator().next().getStartDate()));
+
+        //TODO implementacja
+        pairSet.iterator().forEachRemaining(p -> periodList.add(new Period(p.getStartDate(), p.getEndDate())));
+
+        return periodList;
     }
 }
