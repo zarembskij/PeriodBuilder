@@ -11,6 +11,10 @@ public class Period {
         this.endDate = endDate;
     }
 
+    public Period(Date startDate) {
+        this.startDate = startDate;
+    }
+
     public Date getStartDate() {
         return startDate;
     }

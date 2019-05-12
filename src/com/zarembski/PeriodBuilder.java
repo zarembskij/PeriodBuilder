@@ -1,5 +1,7 @@
 package com.zarembski;
 
+import com.sun.xml.internal.ws.util.StreamUtils;
+
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -69,10 +71,12 @@ public class PeriodBuilder {
     private List<Period> makePeriodFromPair(Date startDate, Date endDate, Set<Pair> pairSet) {
         List<Period> periodList = new LinkedList<>();
 
-        periodList.add(new Period(startDate, pairSet.iterator().next().getStartDate()));
-
-        //TODO implementacja
-        pairSet.iterator().forEachRemaining(p -> periodList.add(new Period(p.getStartDate(), p.getEndDate())));
+        periodList.add(new Period(startDate, pairSet.stream().findFirst().orElseThrow(() -> new RuntimeException(" ")).getStartDate()));
+        Pair lastPair = pairSet.stream().reduce((a, b) -> {
+            periodList.add(new Period(a.getEndDate(), b.getStartDate()));
+            return b;
+        }).orElseThrow(() -> new RuntimeException());
+        periodList.add(new Period(lastPair.getEndDate(), endDate));
 
         return periodList;
     }
